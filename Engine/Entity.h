@@ -2,13 +2,18 @@
 
 #include <vector>
 #include "Vec2.h"
+#include "Drawable.h"
 
 class Entity
 {
 public:
-	Entity( std::vector<Vec2> model )
+	Entity( std::vector<Vec2> model,
+		const Vei2& pos = Vei2::Zero(),
+		Color c = Colors::Yellow )
 		:
-		model( model )
+		model( model ),
+		pos( pos ),
+		c( c )
 	{}
 
 	void SetPos( const Vec2& newPos )
@@ -42,7 +47,15 @@ public:
 		}
 		return( poly );
 	}
+	Drawable GetDrawable() const
+	{
+		Drawable d{ model,c };
+		d.Scale( scale );
+		d.Translate( pos );
+		return( d );
+	}
 private:
+	Color c;
 	float scale = 1.0f;
 	Vec2 pos = Vec2::Zero();
 	std::vector<Vec2> model;
