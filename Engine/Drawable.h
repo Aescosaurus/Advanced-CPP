@@ -16,13 +16,19 @@ public:
 	void Render( Graphics& gfx )
 	{
 		auto temp = model;
+		bool draw = false;
 		for( auto& v : temp )
 		{
 			v.x *= scale.x;
 			v.y *= scale.y;
 			v += translation;
+			if( v.x >= 0 && v.x < Graphics::ScreenWidth ||
+				v.y >= 0 && v.y < Graphics::ScreenHeight )
+			{
+				draw = true;
+			}
 		}
-		gfx.DrawClosedPolyline( temp,c );
+		if( draw ) gfx.DrawClosedPolyline( temp,c );
 	}
 
 	void Translate( const Vec2& translation )
