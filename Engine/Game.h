@@ -50,5 +50,6 @@ private:
 	std::vector<Entity> entities;
 	Camera cam;
 	std::mt19937 rng;
+	Vei2 oldMousePos = Vei2::Zero();
 	/********************************/
 };
