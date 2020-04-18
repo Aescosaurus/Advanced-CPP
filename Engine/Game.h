@@ -26,6 +26,7 @@
 #include "CoordinateTransformer.h"
 #include "Entity.h"
 #include "Camera.h"
+#include <random>
 
 class Game
 {
@@ -48,5 +49,6 @@ private:
 	CoordinateTransformer ct;
 	std::vector<Entity> entities;
 	Camera cam;
+	std::mt19937 rng;
 	/********************************/
 };
