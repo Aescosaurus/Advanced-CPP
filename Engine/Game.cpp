@@ -108,6 +108,11 @@ void Game::UpdateModel()
 		cam.MoveBy( diff / cam.GetScale() );
 	}
 	oldMousePos = wnd.mouse.GetPos();
+
+	for( auto& e : entities )
+	{
+		e.Update();
+	}
 }
 
 void Game::ComposeFrame()
