@@ -9,26 +9,13 @@ class Drawable
 public:
 	Drawable( const std::vector<Vec2>& model,Color c )
 		:
-		model( model ),
+		model( &model ),
 		c( c )
 	{}
 
 	void Render( Graphics& gfx )
 	{
-		auto temp = model;
-		bool draw = false;
-		for( auto& v : temp )
-		{
-			v.x *= scale.x;
-			v.y *= scale.y;
-			v += translation;
-			if( v.x >= 0 && v.x < Graphics::ScreenWidth ||
-				v.y >= 0 && v.y < Graphics::ScreenHeight )
-			{
-				draw = true;
-			}
-		}
-		if( draw ) gfx.DrawClosedPolyline( temp,c );
+		gfx.DrawClosedPolyline( *model,translation,scale,c );
 	}
 
 	void Translate( const Vec2& translation )
@@ -49,7 +36,7 @@ public:
 	}
 private:
 	Color c;
-	const std::vector<Vec2>& model;
+	const std::vector<Vec2>* model;
 	Vec2 translation = Vec2::Zero();
 	Vec2 scale = Vec2::One();
 };

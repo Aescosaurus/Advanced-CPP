@@ -27,49 +27,42 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd ),
 	ct( gfx ),
-	cam( ct ),
-	rng( std::random_device{}() )
+	cam( ct )
 {
-	// entities.emplace_back( Star::Make( 100.0f,50.0f ),Vec2{ 460.0f,0.0f } );
-	// entities.emplace_back( Star::Make( 150.0f,50.0f ),Vec2{ 150.0f,300.0f } );
-	// entities.emplace_back( Star::Make( 100.0f,50.0f ),Vec2{ 250.0f,-200.0f } );
-	// entities.emplace_back( Star::Make( 150.0f,50.0f ),Vec2{ -250.0f,200.0f } );
-	// entities.emplace_back( Star::Make( 100.0f,50.0f ),Vec2{ 0.0f,0.0f } );
-	// entities.emplace_back( Star::Make( 200.0f,50.0f ),Vec2{ -150.0f,-300.0f } );
-	// entities.emplace_back( Star::Make( 100.0f,50.0f ),Vec2{ 400.0f,300.0f } );
-	const auto min = Vec2{ -4000,-2100 };
-	const auto max = Vec2{ 4000,2100 };
-	for( int i = 0; i < 800; ++i )
+	std::mt19937 rng{ std::random_device{}() };
+	std::uniform_real_distribution<float> xDist{ -worldWidth / 2,worldWidth / 2 };
+	std::uniform_real_distribution<float> yDist{ -worldHeight / 2,worldHeight / 2 };
+	std::normal_distribution<float> radDist{ meanStarRadius,devStarRadius };
+	std::normal_distribution<float> ratDist{ meanInnerRatio,devInnerRatio };
+	std::normal_distribution<float> flareDist( meanFlares,devFlares );
+	const Color colors[] = { Colors::Blue,Colors::Cyan,Colors::Green,
+		Colors::Magenta,Colors::Red,Colors::Yellow };
+	std::uniform_int_distribution<size_t> colorSampler( 0,std::end( colors ) - std::begin( colors ) );
+	std::normal_distribution<float> colorFreqDist{ meanColorFreq,devColorFreq };
+	std::uniform_real_distribution<float> phaseDist( 0.0f,2.0f * 3.14159f );
+	std::normal_distribution<float> radiusAmplitudeDist( meanRadiusAmplitude,devRadiusAmplitude );
+	std::normal_distribution<float> radiusFreqDist( meanRadiusFreq,devRadiusFreq );
+	while( stars.size() < nStars )
 	{
-		std::uniform_real_distribution<float> xDist{ min.x,max.x };
-		std::uniform_real_distribution<float> yDist{ min.y,max.y };
-		std::uniform_real_distribution<float> innerDist{ 20.0f,90.0f };
-		std::uniform_real_distribution<float> outerDist{ 50.0f,200.0f };
-		std::uniform_int_distribution<int> flareDist{ 3,10 };
-		std::uniform_int_distribution<int> rDist{ 0,255 };
-		std::uniform_int_distribution<int> gDist{ 0,255 };
-		std::uniform_int_distribution<int> bDist{ 0,255 };
-		const auto pos = Vec2{ xDist( rng ),yDist( rng ) };
-		const auto outerSize = outerDist( rng );
-		bool valid = true;
-		for( const auto& e : entities )
+		const auto rad = std::clamp( radDist( rng ),minStarRadius,maxStarRadius );
+		const float radiusAmplitude = std::clamp( radiusAmplitudeDist( rng ),minRadiusAmplitude,maxRadiusAmplitude );
+		const float maxRad = rad * ( 1.0f + radiusAmplitude );
+		const Vec2 pos = { xDist( rng ),yDist( rng ) };
+		if( std::any_of( stars.begin(),stars.end(),[&]( const StarBro& sb )
+		{ return( ( sb.GetPos() - pos ).GetLength() < maxRad + sb.GetMaxRadius() ); } ) )
 		{
-			const auto& poly = e.GetPolyline();
-			const auto otherOuter = std::max(
-				( poly[0] - e.GetPos() ).GetLength(),
-				( poly[1] - e.GetPos() ).GetLength() );
-			if( ( pos - e.GetPos() ).GetLength() < outerSize + otherOuter )
-			{
-				valid = false;
-			}
+			continue;
 		}
-		if( valid )
-		{
-			entities.emplace_back( Entity{ Star::Make(
-				outerSize,innerDist( rng ),
-				flareDist( rng ) ),pos,
-				Colors::MakeRGB( rDist( rng ),gDist( rng ),bDist( rng ) ) } );
-		}
+
+		const auto rat = std::clamp( ratDist( rng ),minInnerRatio,maxInnerRatio );
+		const Color c = colors[colorSampler( rng )];
+		const int nFlares = std::clamp( int( flareDist( rng ) ),minFlares,maxFlares );
+		const float colorFreq = std::clamp( colorFreqDist( rng ),minColorFreq,maxColorFreq );
+		const float colorPhase = phaseDist( rng );
+		const float radiusFreq = radiusFreqDist( rng );
+		const float radiusPhase = phaseDist( rng );
+		stars.emplace_back( pos,rad,rat,nFlares,c,colorFreq,colorPhase,
+			radiusAmplitude,radiusFreq,radiusPhase );
 	}
 }
 
@@ -83,7 +76,13 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	const float speed = 3.0f;
+	const float dt = ft.Mark();
+	for( auto& s : stars )
+	{
+		s.Update( dt );
+	}
+
+	// const float speed = 3.0f;
 	// if( wnd.kbd.KeyIsPressed( VK_UP ) ) cam.MoveBy( Vec2::Up() * speed );
 	// if( wnd.kbd.KeyIsPressed( VK_DOWN ) ) cam.MoveBy( Vec2::Down() * speed );
 	// if( wnd.kbd.KeyIsPressed( VK_LEFT ) ) cam.MoveBy( Vec2::Left() * speed );
@@ -108,17 +107,16 @@ void Game::UpdateModel()
 		cam.MoveBy( diff / cam.GetScale() );
 	}
 	oldMousePos = wnd.mouse.GetPos();
-
-	for( auto& e : entities )
-	{
-		e.Update();
-	}
 }
 
 void Game::ComposeFrame()
 {
-	for( const auto& entity : entities )
+	const auto vp = cam.GetViewportRect();
+	for( const auto& s : stars )
 	{
-		cam.Draw( entity.GetDrawable() );
+		if( s.GetBoundingRect().IsOverlappingWith( vp ) )
+		{
+			cam.Draw( s.GetDrawable() );
+		}
 	}
 }

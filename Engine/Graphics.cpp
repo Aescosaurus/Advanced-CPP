@@ -330,7 +330,7 @@ void Graphics::DrawLine( Vec2 start,Vec2 end,Color c )
 
 		const float b = start.y - m * start.x;
 
-		for( int x = int( start.x ); x < int( end.x ); ++x )
+		for( int x = int( start.x ); x <= int( end.x ); ++x )
 		{
 			const float y = m * float( x ) + b;
 			const int yi = int( y );
@@ -348,7 +348,7 @@ void Graphics::DrawLine( Vec2 start,Vec2 end,Color c )
 		const float w = ( end.x - start.x ) / ( end.y - start.y );
 		const float p = start.x - w * start.y;
 
-		for( int y = int( start.y ); y < int( end.y ); ++y )
+		for( int y = int( start.y ); y <= int( end.y ); ++y )
 		{
 			const float x = w * float( y ) + p;
 			const int xi = int( x );
@@ -366,6 +366,27 @@ void Graphics::DrawClosedPolyline( const std::vector<Vec2>& verts,Color c )
 		DrawLine( *i,*std::next( i ),c );
 	}
 	DrawLine( verts.back(),verts.front(),c );
+}
+
+void Graphics::DrawClosedPolyline( const std::vector<Vec2>& verts,const Vec2 & translation,const Vec2 & scale,Color c )
+{
+	const auto xform = [&]( Vec2 v )
+	{
+		v.x *= scale.x;
+		v.y *= scale.y;
+		v += translation;
+		return( v );
+	};
+
+	const Vec2 front = xform( verts.front() );
+	Vec2 cur = front;
+	for( auto i = verts.begin(); i != std::prev( verts.end() ); ++i )
+	{
+		const Vec2 next = xform( *std::next( i ) );
+		DrawLine( cur,next,c );
+		cur = next;
+	}
+	DrawLine( cur,front,c );
 }
 
 

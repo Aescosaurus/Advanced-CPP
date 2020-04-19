@@ -61,6 +61,8 @@ public:
 	void PutPixel( int x,int y,Color c );
 	void DrawLine( Vec2 start,Vec2 end,Color c );
 	void DrawClosedPolyline( const std::vector<Vec2>& verts,Color c );
+	void DrawClosedPolyline( const std::vector<Vec2>& verts,
+		const Vec2& translation,const Vec2& scale,Color c );
 	~Graphics();
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;

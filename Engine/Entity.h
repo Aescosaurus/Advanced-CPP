@@ -3,7 +3,6 @@
 #include <vector>
 #include "Vec2.h"
 #include "Drawable.h"
-#include <random>
 
 class Entity
 {
@@ -15,17 +14,7 @@ public:
 		model( model ),
 		pos( pos ),
 		c( c )
-	{
-		std::mt19937 rng{ std::random_device{}() };
-		std::uniform_real_distribution<float> dist{ 0.001f,0.1f };
-		timeScale = dist( rng );
-	}
-
-	void Update()
-	{
-		scale = std::sin( time );
-		time += timeScale;
-	}
+	{}
 
 	void SetPos( const Vec2& newPos )
 	{
@@ -60,17 +49,18 @@ public:
 	}
 	Drawable GetDrawable() const
 	{
-		Drawable d{ model,Colors::Lerp( c,Colors::White,
-			( std::cos( time ) + 1 ) / 2.0f ) };
+		Drawable d{ model,c };
 		d.Scale( scale );
 		d.Translate( pos );
 		return( d );
+	}
+	void SetColor( Color c )
+	{
+		this->c = c;
 	}
 private:
 	Color c;
 	float scale = 1.0f;
 	Vec2 pos = Vec2::Zero();
 	std::vector<Vec2> model;
-	float time = 0.0f;
-	float timeScale;
 };
