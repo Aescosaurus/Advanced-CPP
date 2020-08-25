@@ -107,6 +107,25 @@ public:
 		}
 		return *this;
 	}
+	Vec2_& Rotate( T angle )
+	{
+		const T cosTheta = cos( angle );
+		const T sinTheta = sin( angle );
+
+		const T newX = x * cosTheta - y * sinTheta;
+		y = x * sinTheta + y * cosTheta;
+		x = newX;
+
+		return( *this );
+	}
+	Vec2_ GetRotated( T angle )
+	{
+		return( Vec2_{ this }.Rotate( angle ) );
+	}
+	T operator*( const Vec2_& rhs ) const
+	{
+		return( x * rhs.x + y * rhs.y );
+	}
 
 	static constexpr Vec2_ Up()
 	{
