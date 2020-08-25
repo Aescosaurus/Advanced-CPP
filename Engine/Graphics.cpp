@@ -368,12 +368,22 @@ void Graphics::DrawClosedPolyline( const std::vector<Vec2>& verts,Color c )
 	DrawLine( verts.back(),verts.front(),c );
 }
 
-void Graphics::DrawClosedPolyline( const std::vector<Vec2>& verts,const Vec2 & translation,const Vec2 & scale,Color c )
+void Graphics::DrawClosedPolyline( const std::vector<Vec2>& verts,
+	const Vec2 & translation,const Vec2& scale,float angle,Color c )
 {
+	const float sinTheta = sin( angle );
+	const float cosTheta = cos( angle );
+
 	const auto xform = [&]( Vec2 v )
 	{
+		// Optimized rotation.
+		const float newX = v.x * cosTheta - v.y * sinTheta;
+		v.y = v.x * sinTheta + v.y * cosTheta;
+		v.x = newX;
+
 		v.x *= scale.x;
 		v.y *= scale.y;
+
 		v += translation;
 		return( v );
 	};

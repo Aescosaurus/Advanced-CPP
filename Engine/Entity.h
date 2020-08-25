@@ -28,6 +28,10 @@ public:
 	{
 		scale = s;
 	}
+	void SetAngle( float a )
+	{
+		angle = a;
+	}
 
 	const Vec2& GetPos() const
 	{
@@ -51,6 +55,7 @@ public:
 	{
 		Drawable d{ model,c };
 		d.Scale( scale );
+		d.Rotate( angle );
 		d.Translate( pos );
 		return( d );
 	}
@@ -58,9 +63,14 @@ public:
 	{
 		this->c = c;
 	}
+	float GetAngle()
+	{
+		return( angle );
+	}
 private:
 	Color c;
 	float scale = 1.0f;
+	float angle = 0.0f;
 	Vec2 pos = Vec2::Zero();
 	std::vector<Vec2> model;
 };

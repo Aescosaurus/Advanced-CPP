@@ -15,7 +15,7 @@ public:
 
 	void Render( Graphics& gfx )
 	{
-		gfx.DrawClosedPolyline( *model,translation,scale,c );
+		gfx.DrawClosedPolyline( *model,translation,scale,angle,c );
 	}
 
 	void Translate( const Vec2& translation )
@@ -34,9 +34,15 @@ public:
 		translation.x *= xScale;
 		translation.y *= yScale;
 	}
+	void Rotate( float angle )
+	{
+		this->angle += angle;
+		translation.Rotate( angle );
+	}
 private:
 	Color c;
 	const std::vector<Vec2>* model;
+	float angle = 0.0f;
 	Vec2 translation = Vec2::Zero();
 	Vec2 scale = Vec2::One();
 };

@@ -42,6 +42,7 @@ Game::Game( MainWindow& wnd )
 	std::uniform_real_distribution<float> phaseDist( 0.0f,2.0f * 3.14159f );
 	std::normal_distribution<float> radiusAmplitudeDist( meanRadiusAmplitude,devRadiusAmplitude );
 	std::normal_distribution<float> radiusFreqDist( meanRadiusFreq,devRadiusFreq );
+	std::uniform_real_distribution<float> rotSpeedDist( minRotSpeed,maxRotSpeed );
 	while( stars.size() < nStars )
 	{
 		const auto rad = std::clamp( radDist( rng ),minStarRadius,maxStarRadius );
@@ -61,8 +62,9 @@ Game::Game( MainWindow& wnd )
 		const float colorPhase = phaseDist( rng );
 		const float radiusFreq = radiusFreqDist( rng );
 		const float radiusPhase = phaseDist( rng );
+		const float rotSpeed = rotSpeedDist( rng );
 		stars.emplace_back( pos,rad,rat,nFlares,c,colorFreq,colorPhase,
-			radiusAmplitude,radiusFreq,radiusPhase );
+			radiusAmplitude,radiusFreq,radiusPhase,rotSpeed );
 	}
 }
 
