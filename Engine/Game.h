@@ -31,7 +31,6 @@
 #include "FrameTimer.h"
 #include "ChiliMath.h"
 #include "MouseCameraController.h"
-#include "Mat2.h"
 
 class Game
 {

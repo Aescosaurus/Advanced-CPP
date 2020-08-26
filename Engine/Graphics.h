@@ -26,6 +26,7 @@
 #include "Colors.h"
 #include "Vec2.h"
 #include <vector>
+#include "Mat3.h"
 
 class Graphics
 {
@@ -62,7 +63,7 @@ public:
 	void DrawLine( Vec2 start,Vec2 end,Color c );
 	void DrawClosedPolyline( const std::vector<Vec2>& verts,Color c );
 	void DrawClosedPolyline( const std::vector<Vec2>& verts,
-		const Vec2& translation,const Vec2& scale,float angle,Color c );
+		const Mat3& transform,Color c );
 	~Graphics();
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;

@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Game.h"
 #include "Star.h"
+#include "Mat3.h"
 
 Game::Game( MainWindow& wnd )
 	:
@@ -91,22 +92,12 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	// const auto vp = cam.GetViewportRect();
-	// for( const auto& s : stars )
-	// {
-	// 	if( s.GetBoundingRect().IsOverlappingWith( vp ) )
-	// 	{
-	// 		cam.Draw( s.GetDrawable() );
-	// 	}
-	// }
-	auto star = Star::Make( 100.0f,50.0f );
-	const auto tform = Mat2::Rotation( 0.3f );
-	const auto tform2 = Mat2::Scale( 2.0f );
-	const auto tform3 = Mat2::FlipY();
-	const auto tformcat = tform3 * tform2 * tform;
-	for( auto& v : star )
+	const auto vp = cam.GetViewportRect();
+	for( const auto& s : stars )
 	{
-		v = tformcat * v;
+		if( s.GetBoundingRect().IsOverlappingWith( vp ) )
+		{
+			cam.Draw( s.GetDrawable() );
+		}
 	}
-	cam.Draw( Drawable{ star,Colors::Green } );
 }

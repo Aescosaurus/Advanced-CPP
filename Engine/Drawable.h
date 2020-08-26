@@ -3,6 +3,7 @@
 #include <vector>
 #include "Vec2.h"
 #include "Graphics.h"
+#include "Mat3.h"
 
 class Drawable
 {
@@ -15,34 +16,15 @@ public:
 
 	void Render( Graphics& gfx )
 	{
-		gfx.DrawClosedPolyline( *model,translation,scale,angle,c );
+		gfx.DrawClosedPolyline( *model,transformation,c );
 	}
 
-	void Translate( const Vec2& translation )
+	void ApplyTransformation( const Mat3& transformation )
 	{
-		this->translation += translation;
-	}
-	void Scale( float scale )
-	{
-		this->scale *= scale;
-		translation *= scale;
-	}
-	void Scale( float xScale,float yScale )
-	{
-		scale.x *= xScale;
-		scale.y *= yScale;
-		translation.x *= xScale;
-		translation.y *= yScale;
-	}
-	void Rotate( float angle )
-	{
-		this->angle += angle;
-		translation.Rotate( angle );
+		this->transformation = transformation * this->transformation;
 	}
 private:
 	Color c;
 	const std::vector<Vec2>* model;
-	float angle = 0.0f;
-	Vec2 translation = Vec2::Zero();
-	Vec2 scale = Vec2::One();
+	Mat3 transformation = Mat3::Identity();
 };
