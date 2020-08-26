@@ -27,7 +27,8 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd ),
 	ct( gfx ),
-	cam( ct )
+	cam( ct ),
+	camCtrl( wnd.mouse,wnd.kbd,cam )
 {
 	std::mt19937 rng{ std::random_device{}() };
 	std::uniform_real_distribution<float> xDist{ -worldWidth / 2,worldWidth / 2 };
@@ -79,36 +80,13 @@ void Game::Go()
 void Game::UpdateModel()
 {
 	const float dt = ft.Mark();
+
+	camCtrl.Update( dt );
+
 	for( auto& s : stars )
 	{
 		s.Update( dt );
 	}
-
-	// const float speed = 3.0f;
-	// if( wnd.kbd.KeyIsPressed( VK_UP ) ) cam.MoveBy( Vec2::Up() * speed );
-	// if( wnd.kbd.KeyIsPressed( VK_DOWN ) ) cam.MoveBy( Vec2::Down() * speed );
-	// if( wnd.kbd.KeyIsPressed( VK_LEFT ) ) cam.MoveBy( Vec2::Left() * speed );
-	// if( wnd.kbd.KeyIsPressed( VK_RIGHT ) ) cam.MoveBy( Vec2::Right() * speed );
-
-	while( !wnd.mouse.IsEmpty() )
-	{
-		const auto e = wnd.mouse.Read();
-		if( e.GetType() == Mouse::Event::Type::WheelUp )
-		{
-			cam.SetScale( cam.GetScale() * 1.05f );
-		}
-		else if( e.GetType() == Mouse::Event::Type::WheelDown )
-		{
-			cam.SetScale( cam.GetScale() * 0.95f );
-		}
-	}
-	if( wnd.mouse.LeftIsPressed() )
-	{
-		auto diff = Vec2( wnd.mouse.GetPos() - oldMousePos );
-		diff.x *= -1;
-		cam.MoveBy( diff / cam.GetScale() );
-	}
-	oldMousePos = wnd.mouse.GetPos();
 }
 
 void Game::ComposeFrame()

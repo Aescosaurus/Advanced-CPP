@@ -2,6 +2,7 @@
 
 #include "CoordinateTransformer.h"
 #include "RectF.h"
+#include "ChiliMath.h"
 
 class Camera
 {
@@ -15,6 +16,7 @@ public:
 	{
 		drawable.Translate( -pos );
 		drawable.Scale( scale );
+		drawable.Rotate( angle );
 		ct.Draw( drawable );
 	}
 
@@ -30,6 +32,10 @@ public:
 	{
 		scale = s;
 	}
+	void SetAngle( float angle )
+	{
+		this->angle = angle;
+	}
 
 	const Vec2& GetPos() const
 	{
@@ -39,17 +45,21 @@ public:
 	{
 		return( scale );
 	}
+	float GetAngle() const
+	{
+		return( angle );
+	}
 	RectF GetViewportRect() const
 	{
 		const float zoom = 1.0f / scale;
-		return( RectF::FromCenter(
-			pos,
-			float( Graphics::ScreenWidth / 2 ) * zoom,
-			float( Graphics::ScreenHeight / 2 ) * zoom
-		) );
+		const float diag = sqrt(
+			sq( float( Graphics::ScreenWidth / 2 ) * zoom ) +
+			sq( float( Graphics::ScreenHeight / 2 ) * zoom ) );
+		return( RectF::FromCenter( pos,diag,diag ) );
 	}
 private:
 	Vec2 pos = Vec2::Zero();
 	float scale = 1.0f;
+	float angle = 0.0f;
 	CoordinateTransformer& ct;
 };

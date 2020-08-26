@@ -118,9 +118,9 @@ public:
 
 		return( *this );
 	}
-	Vec2_ GetRotated( T angle )
+	Vec2_ GetRotated( T angle ) const
 	{
-		return( Vec2_{ this }.Rotate( angle ) );
+		return( Vec2_{ *this }.Rotate( angle ) );
 	}
 	T operator*( const Vec2_& rhs ) const
 	{

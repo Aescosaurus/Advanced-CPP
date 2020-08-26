@@ -30,6 +30,7 @@
 #include "StarBro.h"
 #include "FrameTimer.h"
 #include "ChiliMath.h"
+#include "MouseCameraController.h"
 
 class Game
 {
@@ -85,7 +86,7 @@ private:
 	FrameTimer ft;
 	CoordinateTransformer ct;
 	Camera cam;
-	Vei2 oldMousePos = Vei2::Zero();
 	std::vector<StarBro> stars;
+	MouseCameraController camCtrl;
 	/********************************/
 };
